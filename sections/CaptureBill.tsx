@@ -60,7 +60,14 @@ const CaptureBill: React.FC = () => {
 
       <Drawer>
         <DrawerTrigger asChild>
-          <Button className="mt-5">take picture</Button>
+          {loading ? (
+            <Button disabled className="w-full">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              please wait, image is being parsed
+            </Button>
+          ) : (
+            <Button className="mt-5">take picture</Button>
+          )}
         </DrawerTrigger>
 
         <DrawerContent>
@@ -94,7 +101,7 @@ const CaptureBill: React.FC = () => {
               {loading ? (
                 <Button disabled className="w-full">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Please wait
+                  please wait, image is being parsed
                 </Button>
               ) : (
                 <Button
