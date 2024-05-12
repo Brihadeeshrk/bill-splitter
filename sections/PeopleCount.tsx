@@ -21,13 +21,13 @@ const PeopleCount: React.FC = () => {
   return (
     <div className="mt-7 flex-col rounded-xl bg-[#FCEDBA] p-3">
       <p className="font-bold text-md lg:text-xl text-gray-600">
-        Enter the Number of People
+        enter the number of people
       </p>
       <p className="font-bold text-3xl lg:text-4xl">{numberOfParticipants}</p>
 
       <Drawer>
         <DrawerTrigger asChild>
-          <Button className="mt-5">Update</Button>
+          <Button className="mt-5">update</Button>
         </DrawerTrigger>
 
         <DrawerContent>
@@ -45,7 +45,7 @@ const PeopleCount: React.FC = () => {
                   size="icon"
                   className="h-8 w-8 shrink-0 rounded-full"
                   onClick={() => updateNumberOfParticipants(-1)}
-                  disabled={numberOfParticipants <= 0}
+                  disabled={numberOfParticipants <= 1}
                 >
                   <Minus className="h-4 w-4" />
                   <span className="sr-only">Decrease</span>
