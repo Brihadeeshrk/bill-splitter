@@ -1,5 +1,6 @@
 "use client";
 
+import AppProvider from "@/store/context";
 import React from "react";
 
 interface ProvidersProps {
@@ -7,6 +8,10 @@ interface ProvidersProps {
 }
 
 const Providers: React.FC<ProvidersProps> = ({ children }) => {
-  return <main className="w-[80%] lg:w-[50%] mx-auto">{children}</main>;
+  return (
+    <AppProvider>
+      <main className="w-[80%] lg:w-[50%] mx-auto my-10">{children}</main>
+    </AppProvider>
+  );
 };
 export default Providers;

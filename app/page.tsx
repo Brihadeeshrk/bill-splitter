@@ -1,3 +1,11 @@
+import Hero from "@/sections/Hero";
+import PeopleCount from "@/sections/PeopleCount";
+
 export default function Home() {
-  return <main className="border-2 border-red-600">wssup</main>;
+  return (
+    <div className="flex-col">
+      <Hero />
+      <PeopleCount />
+    </div>
+  );
 }
