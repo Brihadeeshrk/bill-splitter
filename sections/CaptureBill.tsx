@@ -12,17 +12,19 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import { AppContext } from "@/store/context";
+import { AppContext, Item } from "@/store/context";
 import React, { useContext } from "react";
 import { createWorker } from "tesseract.js";
 
 const CaptureBill: React.FC = () => {
   const {
-    numberOfParticipants,
     updateFile,
     selectedFile,
     updateResultString,
-    resultString,
+    updateItems,
+    items,
+    updateServiceCharge,
+    updateTaxes,
   } = useContext(AppContext);
   const [loading, setLoading] = React.useState(false);
 
@@ -34,14 +36,54 @@ const CaptureBill: React.FC = () => {
   };
 
   const processImage = async (file: File) => {
+    if (!file) return;
+
     setLoading(true);
     const worker = await createWorker("eng");
 
     try {
       await worker.load();
       const result = await worker.recognize(file); // https://tesseract.projectnaptha.com/img/eng_bw.png
-      console.log(result.data.text);
+
       updateResultString(result.data.text);
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: result.data.text,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          const {
+            items: { items, serviceCharge, taxes, totalAmount },
+          } = data;
+
+          if (serviceCharge) {
+            updateServiceCharge(serviceCharge.total);
+          }
+
+          if (taxes) {
+            const sgst = taxes[0];
+            const cgst = taxes[1];
+
+            updateTaxes({ sgst: sgst.amount, cgst: cgst.amount });
+          }
+
+          console.log("DATA == ", data);
+
+          updateItems(items as Item[]);
+        } else {
+          console.log("giberish");
+        }
+      } else {
+        console.error("API call failed:", res.statusText);
+      }
     } catch (error) {
       console.error("Error processing image:", error);
     } finally {
@@ -50,7 +92,7 @@ const CaptureBill: React.FC = () => {
     }
   };
 
-  console.log("RS", resultString);
+  console.log("ITEMS", items);
 
   return (
     <div className="mt-5 flex-col rounded-xl bg-[#D6CFFD] p-3">
@@ -74,25 +116,24 @@ const CaptureBill: React.FC = () => {
           <div className="mx-auto w-full max-w-sm">
             <DrawerHeader>
               <DrawerTitle>
-                Set the amount you wish to split amongst {numberOfParticipants}{" "}
-                people
+                take a picture of the bill to parse details of items purchased,
+                subtotal etc
               </DrawerTitle>
             </DrawerHeader>
 
             <div className="p-4 pb-0">
-              <div className="flex items-center justify-center space-x-2">
-                <div className="flex-1 text-center">
-                  <div className="grid w-full max-w-sm items-center gap-1.5"></div>
-                  <div className="text-7xl font-bold tracking-normal">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      onChange={onSelectImage}
-                    />
-                  </div>
-                </div>
+              <div className="text-7xl font-bold tracking-normal">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={onSelectImage}
+                />
               </div>
+              <p className="font-bold my-4 text-md text-gray-600 hover:underline text-center">
+                and if the image parsing gives junk content, you could manually
+                enter the bill details too
+              </p>
             </div>
           </div>
 
@@ -116,14 +157,18 @@ const CaptureBill: React.FC = () => {
         </DrawerContent>
       </Drawer>
 
-      {resultString && (
+      <p className="font-bold my-4 text-md lg:text-xl text-gray-600 hover:underline">
+        or, enter it manually
+      </p>
+
+      {/* {resultString && (
         <div>
           <p className="font-bold my-4 text-md lg:text-xl text-gray-600">
             parsed information
           </p>
           <p className="whitespace-pre-line">{resultString}</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

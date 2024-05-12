@@ -1,5 +1,12 @@
 import React, { createContext } from "react";
 
+export interface Item {
+  itemName: string;
+  quantity: number;
+  rate: number;
+  total: number;
+}
+
 interface AppContextType {
   numberOfParticipants: number;
   updateNumberOfParticipants: (adjustment: number) => void;
@@ -7,6 +14,12 @@ interface AppContextType {
   updateFile: (file: File) => void;
   resultString: string;
   updateResultString: (text: string) => void;
+  items: Item[];
+  updateItems: (items: Item[]) => void;
+  serviceCharge: number | 0;
+  updateServiceCharge: (charge: number) => void;
+  taxes: { cgst: number; sgst: number } | 0;
+  updateTaxes: (taxes: { cgst: number; sgst: number }) => void;
 }
 
 export const AppContext = createContext<AppContextType>({
@@ -16,6 +29,12 @@ export const AppContext = createContext<AppContextType>({
   updateFile: (file: File) => {},
   resultString: "",
   updateResultString: (text: string) => {},
+  items: [],
+  updateItems: (items: Item[]) => {},
+  serviceCharge: 0,
+  updateServiceCharge: (charge: number) => {},
+  taxes: { cgst: 0, sgst: 0 },
+  updateTaxes: (taxes: { cgst: number; sgst: number }) => {},
 });
 
 const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -38,6 +57,27 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     setResultString(text);
   };
 
+  const [items, setItems] = React.useState<Item[]>([]);
+
+  const updateItems = (items: Item[]) => {
+    setItems(items);
+  };
+
+  const [serviceCharge, setServiceCharge] = React.useState<number>(0);
+
+  const updateServiceCharge = (charge: number) => {
+    setServiceCharge(charge);
+  };
+
+  const [taxes, setTaxes] = React.useState<{ cgst: number; sgst: number }>({
+    cgst: 0,
+    sgst: 0,
+  });
+
+  const updateTaxes = (taxes: { cgst: number; sgst: number }) => {
+    setTaxes(taxes);
+  };
+
   const value: AppContextType = {
     numberOfParticipants,
     updateNumberOfParticipants,
@@ -45,6 +85,12 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     updateFile,
     resultString,
     updateResultString,
+    items,
+    updateItems,
+    serviceCharge,
+    updateServiceCharge,
+    taxes,
+    updateTaxes,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
