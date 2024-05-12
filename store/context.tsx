@@ -1,13 +1,24 @@
 import React, { createContext } from "react";
 
-export const AppContext = createContext({
+interface AppContextType {
+  numberOfParticipants: number;
+  updateNumberOfParticipants: (adjustment: number) => void;
+  selectedFile: File | undefined;
+  updateFile: (file: File) => void;
+  resultString: string;
+  updateResultString: (text: string) => void;
+}
+
+export const AppContext = createContext<AppContextType>({
   numberOfParticipants: 0,
   updateNumberOfParticipants: (adjustment: number) => {},
-  amountToSplit: 0,
-  updateAmountToSplit: (amount: number) => {},
+  selectedFile: undefined,
+  updateFile: (file: File) => {},
+  resultString: "",
+  updateResultString: (text: string) => {},
 });
 
-const AppProvider = ({ children }: { children: React.ReactNode }) => {
+const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [numberOfParticipants, setNumberOfParticipants] =
     React.useState<number>(1);
 
@@ -15,18 +26,27 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     setNumberOfParticipants((prevCount) => prevCount + adjustment);
   };
 
-  const [amountToSplit, setAmountToSplit] = React.useState<number>(0);
+  const [selectedFile, setSelectedFile] = React.useState<File | undefined>();
 
-  const updateAmountToSplit = (amount: number) => {
-    setAmountToSplit(amount);
+  const updateFile = (file: File) => {
+    setSelectedFile(file);
   };
 
-  const value = {
+  const [resultString, setResultString] = React.useState<string>("");
+
+  const updateResultString = (text: string) => {
+    setResultString(text);
+  };
+
+  const value: AppContextType = {
     numberOfParticipants,
     updateNumberOfParticipants,
-    amountToSplit,
-    updateAmountToSplit,
+    selectedFile,
+    updateFile,
+    resultString,
+    updateResultString,
   };
+
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 export default AppProvider;

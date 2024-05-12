@@ -1,4 +1,4 @@
-import Amount from "@/sections/Amount";
+import Amount from "@/sections/CaptureBill";
 import Hero from "@/sections/Hero";
 import PeopleCount from "@/sections/PeopleCount";
 
